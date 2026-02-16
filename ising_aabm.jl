@@ -90,8 +90,6 @@ model = IsingModel(gr)
 # rather than a space type
 # abmvideo("ising.mp4",model)
 
-# debator_agent_color(id, model) = model[id].σ == 1 ? :red : :blue
-
 function debator_agent_color(agents)
     ags = collect(agents)
 
@@ -110,6 +108,7 @@ fig, ax, abmobs = abmplot(
     graphplot = true
 )
 
-record(fig, "ising.mp4", 1:100) do i
+record(fig, "ising.mp4", 1:100;framerate=4) do i
     step!(model, 1)
+    abmobs.model[] = model
 end
