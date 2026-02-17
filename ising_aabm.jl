@@ -10,8 +10,14 @@ using Random: MersenneTwister
 #--          AGENTS           --#
 #-------------------------------#
 
+# Classic Ising model
 @agent struct DebatorAgent(GraphAgent)
     σ::Int8 # +1/-1
+end
+
+# Augmented model
+@agent struct ContinuousDebatorAgent(GraphAgent)
+    σ::Float64 # between -1 and 1
 end
 
 #-------------------------------#
@@ -80,6 +86,19 @@ function agent_step!(agent, model)
 end
 
 #-------------------------------#
+#--        IMPROVEMENT        --#
+#-------------------------------#
+
+function ϕ_interaction(i,j;
+    κ=1.5, # threshold before respulsion
+    α=0.2  # strength of the learning
+)
+    return α * tanh(κ-abs(b-a)) * (b*abs(b-a))
+end
+
+
+
+#-------------------------------#
 #--          RUNNING          --#
 #-------------------------------#
 
@@ -108,7 +127,7 @@ fig, ax, abmobs = abmplot(
     graphplot = true
 )
 
-record(fig, "ising.mp4", 1:100;framerate=4) do i
+record(fig, "ising.mp4", 1:40;framerate=2) do i
     step!(model, 1)
     abmobs.model[] = model
 end
