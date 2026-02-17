@@ -1,10 +1,16 @@
-# Important dependencies
+# Dependencies
 
-using Agents
-using Graphs
-using CairoMakie
+using Agents                # Agents
+
+using Graphs                # Graphs
+using SimpleWeightedGraphs
+
+using GLMakie               # Plotting
 using GraphMakie
-using Random: MersenneTwister
+
+using Random                # Randomness
+using Distributions
+
 
 #-------------------------------#
 #--          AGENTS           --#
@@ -96,6 +102,27 @@ function ϕ_interaction(i,j;
     return α * tanh(κ-abs(b-a)) * (b*abs(b-a))
 end
 
+# J is a weighted directed copy of our graph space
+# It defines the influence of an agent j to an agent i
+# This gives the J_{i,j} in the formula
+function createJ(gr::Graph;α=2,θ=0.5)
+    γ_distrib = Gamma(α,θ)
+
+    grd = SimpleWeightedDiGraph(nv(gr))
+
+    for e in edges(gr)
+        u = src(e)
+        v = dst(e)
+
+        uv_w = 0.1*maximum(rand(γ_distrib,degree(gr,v)))
+        vu_w = 0.1*maximum(rand(γ_distrib,degree(gr,u)))
+
+        add_edge!(grd,u,v,uv_w)
+        add_edge!(grd,v,u,vu_w)
+    end
+
+    return grd
+end
 
 
 #-------------------------------#
